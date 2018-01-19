@@ -7,7 +7,7 @@ Arduino based robot car
 ## Chassis
 ![Chassis](/arduino/chassis/chassis.JPG "chassis")
 
-## Batterry
+## Battery
 ![Battery](/arduino/battery/battery.jpg "battery")
 ![Battery](/arduino/battery/battery2.jpg "battery")
 
