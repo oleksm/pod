@@ -2,10 +2,14 @@
 #include "rcinput.h"
 #include "rccopter.h"
 
+//
+//Joystick lj(9, 0, 1);
+//
+//
+//Joystick rj(10, 2, 3);
+////RCCopter copter;
 
-Joystick lj(1, 0, 9);
-Joystick rj(2, 3, 10);
-RCCopter copter;
+Copter copter;
 
 void setup() {
   Serial.begin(57600);
@@ -14,12 +18,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Loop");
-  lj.update();
-  rj.update();
-  uint16_t throttle = lj.getUp();
-  copter.setThrottle(throttle);
-
-  delay(200);
+  copter.loop();
 }
 

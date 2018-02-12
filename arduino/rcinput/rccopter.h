@@ -15,6 +15,7 @@
 #define SERVO_MID 1500
 #define SERVO_MAX 2000
 
+// Receiver Outbound pins
 #define COPTER_PIN_THROTTLE 3
 #define COPTER_PIN_YAW 9
 #define COPTER_PIN_PITCH 6
@@ -23,6 +24,7 @@
 #define COPTER_PIN_AUX2 4
 
 #define CMD_PING 1
+#define CMD_PONG 1
 #define CMD_ARM 3
 #define CMD_DISARM 4
 #define CMD_HOME 5
@@ -74,24 +76,19 @@ class Copter
     void setRoll(uint16_t roll);
     void setAux1(uint16_t aux1);
     void setAux2(uint16_t aux2);
+    void loop();
   private:
-    RCRadio radio;
+    RCRadio *radio;
     Servo s_throttle;
     Servo s_yaw;
     Servo s_pitch;
     Servo s_roll;
     Servo s_aux1;
     Servo s_aux2;
-    uint8_t throttle;
-    uint8_t yaw;
-    uint8_t pitch;
-    uint8_t roll;
-    uint8_t aux1;
-    uint8_t aux2;
 };
 
-void rccopter_receive(uint8_t cmd, uint16_t data);
-void copter_receive(uint8_t cmd, uint16_t data);
+void rccopter_receive(void* copter, uint8_t cmd, uint16_t data);
+void copter_receive(void* copter, uint8_t cmd, uint16_t data);
 
 
 #endif

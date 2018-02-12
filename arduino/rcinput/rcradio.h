@@ -12,7 +12,7 @@
 #define RECEIVER_PIN_CE 8
 #define RECEIVER_PIN_CSN 7
 
-#define RECEIVE_CALLBACK_FUNCTION void (*receive_callback)(uint8_t cmd, uint16_t data)
+#define RECEIVE_CALLBACK_FUNCTION void (*receive_callback)(void* copter, uint8_t cmd, uint16_t data)
 
 
 #define TRANSMITTER_ADDRESS 0x85a4883bbc63
@@ -21,13 +21,13 @@
 class RCRadio
 {
   public:
-    RCRadio(int ce, int csn, uint64_t send_address, uint64_t receive_address, RECEIVE_CALLBACK_FUNCTION);
+    RCRadio(int ce, int csn, uint64_t send_address, uint64_t receive_address, RECEIVE_CALLBACK_FUNCTION, void* copter);
     bool send(uint8_t cmd, uint16_t data);
     void receive();
   private:
     RF24 radio;
     RECEIVE_CALLBACK_FUNCTION;
+    void* copter;
 };
 
 #endif
-

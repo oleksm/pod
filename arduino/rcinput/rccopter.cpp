@@ -1,31 +1,13 @@
 
 #include "rccopter.h"
 
-
-
-void rccopter_receive(uint8_t cmd, uint16_t data)
-{
-  Serial.print ("RCCopter Received: ");
-  Serial.print(cmd);
-  Serial.print(" ");
-  Serial.println(data);
-}
-
-void copter_receive(uint8_t cmd, uint16_t data)
-{
-  Serial.print ("Copter Received: ");
-  Serial.print(cmd);
-  Serial.print(" ");
-  Serial.println(data);
-}
-
 RCCopter::RCCopter()
 {
 }
 
 void RCCopter::connect()
 {
-  radio = new RCRadio(TRANSMITTER_PIN_CE, TRANSMITTER_PIN_CSN,TRANSMITTER_ADDRESS, RECEIVER_ADDRESS, *rccopter_receive);
+  radio = new RCRadio(TRANSMITTER_PIN_CE, TRANSMITTER_PIN_CSN,TRANSMITTER_ADDRESS, RECEIVER_ADDRESS, *rccopter_receive, this);
 }
 
 void RCCopter::arm()
@@ -83,14 +65,13 @@ void RCCopter::setAux2(uint16_t aux2)
 
 
 Copter::Copter()
-:
-  radio(RECEIVER_PIN_CE, RECEIVER_PIN_CSN, RECEIVER_ADDRESS,TRANSMITTER_ADDRESS, *copter_receive)
 {
 }
 
 
 void Copter::connect()
 {
+    radio = new RCRadio(RECEIVER_PIN_CE, RECEIVER_PIN_CSN, RECEIVER_ADDRESS,TRANSMITTER_ADDRESS, *copter_receive, this);
     s_throttle.attach(COPTER_PIN_THROTTLE);
     s_yaw.attach(COPTER_PIN_YAW);
     s_pitch.attach(COPTER_PIN_PITCH);
@@ -149,5 +130,79 @@ void Copter::setAux1(uint16_t aux1)
 void Copter::setAux2(uint16_t aux2)
 {
   s_aux2.writeMicroseconds(aux2);
+}
+
+void Copter::loop()
+{
+  radio->receive();  
+}
+
+void rccopter_receive(void* cptr, uint8_t cmd, uint16_t data)
+{
+  RCCopter *copter = (RCCopter*)cptr;
+  
+  Serial.print ("Copter Received cmd: ");
+  Serial.print(cmd);
+  Serial.print(" data: ");
+  Serial.println(data);
+
+  switch(cmd)
+  {
+  case CMD_PONG:
+    break;
+  default:
+    Serial.print("Copter received unknown command: ");
+    Serial.println(cmd);
+    break;
+  }
+}
+
+
+void copter_receive(void* cptr, uint8_t cmd, uint16_t data)
+{
+  Copter *copter = (Copter*)cptr;
+
+  Serial.print ("Copter Received cmd: ");
+  Serial.print(cmd);
+  Serial.print(" data: ");
+  Serial.println(data);
+
+  switch(cmd)
+  {
+  case CMD_PING:
+    copter->pong();
+    break;
+  case CMD_ARM:
+    copter->arm();
+    break;
+  case CMD_DISARM:
+    copter->disarm();
+    break;
+  case CMD_HOME:
+    copter->returnHome();
+    break;
+  case CMD_THROTTLE:
+    copter->setThrottle(data);
+    break;
+  case CMD_YAW:
+    copter->setYaw(data);
+    break;
+  case CMD_PITCH:
+    copter->setPitch(data);
+    break;
+  case CMD_ROLL:
+    copter->setRoll(data);
+    break;    
+  case CMD_AUX1:
+    copter->setAux1(data);
+    break;
+  case CMD_AUX2:
+    copter->setAux2(data);
+    break;
+  default:
+    Serial.print("Copter received unknown command: ");
+    Serial.println(cmd);
+    break;
+  }
 }
 
