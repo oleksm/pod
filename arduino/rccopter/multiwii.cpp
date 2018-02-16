@@ -4,6 +4,7 @@
 
 Multiwii::Multiwii()
 {
+  connected = 0;
 }
 
 void Multiwii::connect()
@@ -13,11 +14,10 @@ void Multiwii::connect()
 
 bool Multiwii::refresh()
 {
-  if (!Serial)
-    return 0;
   uint16_t i2cErrorCounter = status.i2cErrorCounter;
   bool res = msp.request(MSP_STATUS, &status, sizeof(status));
   error = i2cErrorCounter != status.i2cErrorCounter;
+  return res;
 }
 
 boolean Multiwii::isError()
@@ -31,10 +31,8 @@ boolean Multiwii::isArmed()
   return status.flightModeFlags & 1;
 }
 
-boolean Multiwii::disarm()
+bool Multiwii::disarm()
 {
-  if (!Serial)
-    return 0;
   msp_rc_t rc;
   if (msp.request(MSP_RC, &rc, sizeof(rc)))
   {
@@ -63,4 +61,3 @@ boolean Multiwii::disarm()
   }
   return 0;
 }
-

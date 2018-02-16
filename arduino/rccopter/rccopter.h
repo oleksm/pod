@@ -9,6 +9,8 @@
 #include "rcinput.h"
 #include "multiwii.h"
 
+#define DEBUG_ON 0
+
 #define AUX_LOW 0
 #define AUX_high 255
 #define AUX_MID 127
@@ -90,6 +92,7 @@ class Copter
     void setAux2(uint16_t aux2);
     void loop();
   private:
+  bool connected;
     Multiwii multiwii;
     RCRadio radio;
     Servo s_throttle;

@@ -1,5 +1,6 @@
 
 #include "rcradio.h"
+#include "rccopter.h"
 
 
 RCRadio::RCRadio(int ce, int csn)
@@ -30,12 +31,15 @@ bool RCRadio::send(uint8_t cmd, uint16_t data)
   bool success = radio.write( &data, sizeof(data));
   long ms1 = millis();
   radio.startListening();
-  Serial.print("Radio transmission status: ");
-  Serial.print(success);
-  Serial.print(" ms: ");
-  Serial.print(ms1 - ms);
-  Serial.print(" data: ");
-  Serial.println(data, HEX);
+  if (DEBUG_ON)
+  {
+    Serial.print("Radio transmission status: ");
+    Serial.print(success);
+    Serial.print(" ms: ");
+    Serial.print(ms1 - ms);
+    Serial.print(" data: ");
+    Serial.println(data, HEX);
+  }
   return success;
 }
 

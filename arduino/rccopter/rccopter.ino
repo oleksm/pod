@@ -4,15 +4,20 @@
 // Speify target
 // RCCopter - Remote Control (joystick hardware)
 // Copter - Onboard Control (copter hardware)
-RCCopter copter;
+Copter copter;
 
 void setup() {
+  if (DEBUG_ON)
+    Serial.begin(115200);
   copter.begin();
-  Serial.println("Setup Complete");
+  
+  if (DEBUG_ON)
+    Serial.println("Setup Complete");
+  
 }
 
 void loop() {
   copter.loop();
-  delay(50);
+  delay(10);
 }
 

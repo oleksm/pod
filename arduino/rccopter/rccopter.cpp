@@ -149,6 +149,7 @@ Copter::Copter()
 :
   radio(RECEIVER_PIN_CE, RECEIVER_PIN_CSN)
 {
+  connected = 0;
 }
 
 void Copter::begin()
@@ -158,7 +159,7 @@ void Copter::begin()
 
 bool Copter::connect()
 {
-  if (!Serial)
+  if (!connected)
   {
     Serial.begin(115200);
     s_throttle.attach(COPTER_PIN_THROTTLE);
@@ -168,13 +169,14 @@ bool Copter::connect()
     s_aux1.attach(COPTER_PIN_AUX1);
     s_aux2.attach(COPTER_PIN_AUX2);
     multiwii.connect();
+    connected = 1;
   }
-  return Serial;
+  return connected;
 }
 
 void Copter::disconnect()
 {
-  if (Serial)
+  if (connected)
   {
     disarm();
     s_throttle.detach();
@@ -184,13 +186,14 @@ void Copter::disconnect()
     s_aux1.detach();
     s_aux2.detach();
     Serial.end();
+    connected = 0;
   }
 }
 
 void Copter::disarm()
 {
   bool res = 0;
-  if (Serial)
+  if (connected)
   {
     if (!multiwii.disarm())
     {
@@ -211,11 +214,12 @@ void Copter::returnHome()
 
 void Copter::pong()
 {
-  multiwii.refresh();
-  uint8_t status = multiwii.isError() << 2 | multiwii.isArmed() << 1;
-  if (Serial) 
+ 
+  uint8_t status = 0;
+  if (connected)
   {
-    status |= 1;
+    multiwii.refresh();
+    status = multiwii.isError() << 2 | multiwii.isArmed() << 1 | 1;
   }
   radio.send(CMD_PONG, status);
 }
@@ -252,22 +256,24 @@ void Copter::setAux2(uint16_t aux2)
 
 void Copter::loop()
 {
-  radio.receive();  
+  radio.receive();
 }
 
 void copter_receive(void* cptr, uint8_t cmd, uint16_t data)
 {
   Copter *copter = (Copter*)cptr;
 
-  Serial.print ("Copter Received cmd: ");
-  Serial.print(cmd);
-  Serial.print(" data: ");
-  Serial.println(data);
+  if (DEBUG_ON)
+  {
+    Serial.print("Copter Received cmd: ");
+    Serial.print(cmd);
+    Serial.print(" data: ");
+    Serial.println(data);    
+  }
 
   switch(cmd)
   {
   case CMD_PING:
-    copter->pong();
     break;
   case CMD_DISARM:
     copter->disarm();
@@ -300,8 +306,11 @@ void copter_receive(void* cptr, uint8_t cmd, uint16_t data)
     copter->setAux2(data);
     break;
   default:
-    Serial.print("Copter received unknown command: ");
-    Serial.println(cmd);
+    if (DEBUG_ON)
+    {
+      Serial.print("Copter received unknown command: ");
+      Serial.println(cmd);      
+    }
     break;
   }
   copter->pong();

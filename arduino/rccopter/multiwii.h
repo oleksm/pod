@@ -18,6 +18,7 @@ class Multiwii
     MSP msp;
     msp_status_t status;
     bool error;
+    bool connected;
 };
 
 #endif
