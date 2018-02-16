@@ -8,7 +8,7 @@
 #define J_MID 512
 #define J_MAX 1024
 
-#define J_NOISE_TRESHOLD 11
+#define J_NOISE_TRESHOLD 12
 
 #define SERVO_MIN 1020
 #define SERVO_MID 1500
@@ -60,6 +60,7 @@ class AnalogButton
   private:
     int pin;
     uint16_t high;
+    bool state;
 };
 
 #define MELODY_POWER_ON 0

@@ -12,7 +12,7 @@ void RCInput::begin()
   left.begin(9, 0, 1);
   right.begin(10, 3, 2);
   blue.begin(5, 80);
-  yellow.begin(4, 80);
+  yellow.begin(4, 150);
   red.begin(3, 80);
   // buizzer 6
   b_connect.begin(A6, 930);
@@ -62,7 +62,7 @@ void RCInput::refresh(void* cptr)
   }
 
   if (b_connect.isPressed())
-  {
+  {   
     if (copter->isConnected())
       copter->disconnect();
     else
@@ -186,7 +186,7 @@ void LED::begin(int pin, int intensity)
   this->pin = pin;
   this->intensity = intensity;
   pinMode(pin, OUTPUT);
-  value = 0;
+  value = LOW;
 }
 
 void LED::set(bool light)
@@ -203,19 +203,26 @@ void LED::set(bool light)
 
 AnalogButton::AnalogButton()
 {
-  
+  state = 0;
 }
 
 void AnalogButton::begin(int pin, uint16_t high)
 {
     this->pin = pin;
+    this->high = high;
     pinMode(pin, INPUT);
 }
 
 bool AnalogButton::isPressed()
 {
   int v = analogRead(pin);
-  return v > high - 20 && v < high + 20;
+  bool pressed = v > high - 20 && v < high + 20;
+  if (pressed != state)
+  {
+    state = pressed;
+    return pressed;
+  }
+  return 0;
 }
 
 
@@ -230,21 +237,21 @@ void Buzzer::begin(int pin)
 
 void Buzzer::play(uint8_t melody)
 {
-  switch (melody)
-  {
-    case MELODY_POWER_ON:
-      tone(pin, 800, 100);
-      delay(100);
-      tone(pin, 800, 100);
-      delay(100);
-      tone(pin, 800, 100);
-      break;
-    case MELODY_ERROR_RADIO:
-      tone(pin, 1000, 300);
-      delay(50);
-      tone(pin, 500, 300);
-      break;
-  }
+//  switch (melody)
+//  {
+//    case MELODY_POWER_ON:
+//      tone(pin, 800, 100);
+//      delay(100);
+//      tone(pin, 800, 100);
+//      delay(100);
+//      tone(pin, 800, 100);
+//      break;
+//    case MELODY_ERROR_RADIO:
+//      tone(pin, 1000, 300);
+//      delay(50);
+//      tone(pin, 500, 300);
+//      break;
+//  }
 }
 
 // ===================== Timer ============
