@@ -6,14 +6,12 @@
 #include <Servo.h>
 
 #include "rcradio.h"
+#include "rcinput.h"
+#include "multiwii.h"
 
 #define AUX_LOW 0
 #define AUX_high 255
 #define AUX_MID 127
-
-#define SERVO_MIN 1020
-#define SERVO_MID 1500
-#define SERVO_MAX 2000
 
 // Receiver Outbound pins
 #define COPTER_PIN_THROTTLE 3
@@ -24,23 +22,27 @@
 #define COPTER_PIN_AUX2 4
 
 #define CMD_PING 1
-#define CMD_PONG 1
-#define CMD_ARM 3
-#define CMD_DISARM 4
-#define CMD_HOME 5
-#define CMD_THROTTLE 6
-#define CMD_YAW 7
-#define CMD_PITCH 8
-#define CMD_ROLL 9
-#define CMD_AUX1 10
-#define CMD_AUX2 11
+#define CMD_PONG 2
+#define CMD_CONNECT 3
+#define CMD_DISCONNECT 4
+#define CMD_DISARM 5
+#define CMD_HOME 6
+#define CMD_THROTTLE 7
+#define CMD_YAW 8
+#define CMD_PITCH 9
+#define CMD_ROLL 10
+#define CMD_AUX1 11
+#define CMD_AUX2 12
+
+#define TIMER_PING 0
 
 class RCCopter
 {
   public:
     RCCopter();
-    void connect();
-    void arm();
+    void begin();
+    bool connect();
+    void disconnect();
     void disarm();
     void returnHome();
     void ping();
@@ -50,9 +52,18 @@ class RCCopter
     void setRoll(uint16_t roll);
     void setAux1(uint16_t aux1);
     void setAux2(uint16_t aux2);
-    
+    bool isArmed();
+    bool isConnected();
+    bool isFlying();
+    bool isError();
+    void pong(uint8_t status);
+    void loop();
   private:
-    RCRadio *radio;
+    uint8_t status;
+    Timer timer;
+    Buzzer buzzer;
+    RCInput input;
+    RCRadio radio;
     uint8_t throttle;
     uint8_t yaw;
     uint8_t pitch;
@@ -65,8 +76,9 @@ class Copter
 {
   public:
     Copter();
-    void connect();
-    void arm();
+    void begin();
+    bool connect();
+    void disconnect();
     void disarm();
     void returnHome();
     void pong();
@@ -78,7 +90,8 @@ class Copter
     void setAux2(uint16_t aux2);
     void loop();
   private:
-    RCRadio *radio;
+    Multiwii multiwii;
+    RCRadio radio;
     Servo s_throttle;
     Servo s_yaw;
     Servo s_pitch;

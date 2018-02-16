@@ -2,9 +2,13 @@
 #include "rcradio.h"
 
 
-RCRadio::RCRadio(int ce, int csn, uint64_t send_address, uint64_t receive_address, RECEIVE_CALLBACK_FUNCTION, void* copter)
+RCRadio::RCRadio(int ce, int csn)
 :
   radio(ce, csn)
+{
+}
+
+void RCRadio::begin(uint64_t send_address, uint64_t receive_address, RECEIVE_CALLBACK_FUNCTION, void* copter)
 {
   Serial.println("Initializing RCRadio");
   radio.begin();
@@ -41,7 +45,7 @@ void RCRadio::receive()
   if (radio.available() ) {
     radio.read(&data, sizeof(uint16_t));
 
-    uint16_t cmd = data >> 12;
+    uint8_t cmd = data >> 12;
     data &= 0x0FFF;
     receive_callback(copter, cmd, data);
   }

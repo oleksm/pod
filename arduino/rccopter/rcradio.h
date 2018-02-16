@@ -21,7 +21,8 @@
 class RCRadio
 {
   public:
-    RCRadio(int ce, int csn, uint64_t send_address, uint64_t receive_address, RECEIVE_CALLBACK_FUNCTION, void* copter);
+    RCRadio(int ce, int csn);
+    void begin(uint64_t send_address, uint64_t receive_address, RECEIVE_CALLBACK_FUNCTION, void* copter);
     bool send(uint8_t cmd, uint16_t data);
     void receive();
   private:
